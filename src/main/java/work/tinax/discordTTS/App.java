@@ -1,4 +1,4 @@
-package work.tinax.DiscordTTS;
+package work.tinax.discordTTS;
 
 import javax.security.auth.login.LoginException;
 

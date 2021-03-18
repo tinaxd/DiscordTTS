@@ -1,9 +1,8 @@
-package work.tinax.DiscordTTS;
+package work.tinax.discordTTS;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
