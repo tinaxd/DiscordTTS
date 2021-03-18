@@ -84,7 +84,6 @@ public class DiscordBot extends ListenerAdapter {
 		if (msg.startsWith("!")) return false;
 		try {
 			String ttsMsg = event.getAuthor().getName() + " " + msg;
-			System.out.println("TTS: " + ttsMsg);
 			botAudioManager.playTTS(ttsMsg);
 		} catch (IOException | TTSException e) {
 			try {

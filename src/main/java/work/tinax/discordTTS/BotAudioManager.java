@@ -31,7 +31,7 @@ public class BotAudioManager {
 	}
 	
 	private void loadAndPlayWavTrack() {
-		playerManager.loadItem("/home/tinaxd/output.wav", new AudioLoadResultHandler() {
+		playerManager.loadItem(tts.getWavTargetPath(), new AudioLoadResultHandler() {
 
 			@Override
 			public void trackLoaded(AudioTrack track) {

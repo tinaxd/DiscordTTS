@@ -20,7 +20,18 @@ public class JapaneseTalk {
 	private static JapaneseTalk instance = null;
 	
 	private JapaneseTalk() {
-
+		htsVoicePath = System.getenv("HTS_VOICE_PATH");
+		if (htsVoicePath == null || htsVoicePath.isBlank()) {
+			throw new IllegalStateException("HTS_VOICE_PATH is not set");
+		}
+		naistDictDir = System.getenv("NAIST_DICT_DIR");
+		if (naistDictDir == null || naistDictDir.isBlank()) {
+			throw new IllegalStateException("NAIST_DICT_DIR is not set");
+		}
+		wavTargetPath = System.getenv("WAV_TARGET_PATH");
+		if (wavTargetPath == null || wavTargetPath.isBlank()) {
+			throw new IllegalStateException("WAV_TARGET_PATH is not set (must be an absolute path)");
+		}
 	}
 	
 	public static synchronized JapaneseTalk getInstance() {
@@ -30,12 +41,17 @@ public class JapaneseTalk {
 		return instance;
 	}
 	
-	private final static String HTS_VOICE_PATH = "/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice";
-	private final static String DICT_PATH = "/var/lib/mecab/dic/open-jtalk/naist-jdic";
+	private final String htsVoicePath;
+	private final String naistDictDir;
+	private final String wavTargetPath;
+	
+	public String getWavTargetPath() {
+		return wavTargetPath;
+	}
 	
 	public synchronized Path createTTSFile(String msg) throws IOException, TTSException {
 		makeTTSFile(msg);
-		return Paths.get("~/output.wav");
+		return Paths.get(wavTargetPath);
 	}
 	
 	private void makeTTSFile(String msg) throws IOException, TTSException {
@@ -45,9 +61,9 @@ public class JapaneseTalk {
 			"-s", "48000",
 			"-p", "240",
 			"-a", "0.55",
-			"-m", HTS_VOICE_PATH,
-			"-ow", "/home/tinaxd/output.wav",
-			"-x", DICT_PATH
+			"-m", htsVoicePath,
+			"-ow", wavTargetPath,
+			"-x", naistDictDir
 		};
 		Process proc = runtime.exec(cmds);
 		
