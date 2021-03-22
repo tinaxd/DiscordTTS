@@ -28,9 +28,9 @@ public class JapaneseTalk {
 		if (naistDictDir == null || naistDictDir.isBlank()) {
 			throw new IllegalStateException("NAIST_DICT_DIR is not set");
 		}
-		wavTargetPath = System.getenv("WAV_TARGET_PATH");
-		if (wavTargetPath == null || wavTargetPath.isBlank()) {
-			throw new IllegalStateException("WAV_TARGET_PATH is not set (must be an absolute path)");
+		wavTargetDir = System.getenv("WAV_TARGET_DIR");
+		if (wavTargetDir == null || wavTargetDir.isBlank()) {
+			throw new IllegalStateException("WAV_TARGET_DIR is not set (must be an absolute path)");
 		}
 	}
 	
@@ -43,18 +43,22 @@ public class JapaneseTalk {
 	
 	private final String htsVoicePath;
 	private final String naistDictDir;
-	private final String wavTargetPath;
+	private final String wavTargetDir;
 	
-	public String getWavTargetPath() {
-		return wavTargetPath;
+	public String getWavTargetDir() {
+		return wavTargetDir;
 	}
 	
-	public synchronized Path createTTSFile(String msg) throws IOException, TTSException {
-		makeTTSFile(msg);
-		return Paths.get(wavTargetPath);
+	public String getWavTargetPath(String targetName) {
+		return wavTargetDir + "/" + targetName;
 	}
 	
-	private void makeTTSFile(String msg) throws IOException, TTSException {
+	public synchronized Path createTTSFile(String msg, String targetName) throws IOException, TTSException {
+		makeTTSFile(msg, targetName);
+		return Paths.get(wavTargetDir + "/" + targetName);
+	}
+	
+	private void makeTTSFile(String msg, String targetName) throws IOException, TTSException {
 		Runtime runtime = Runtime.getRuntime();
 		String[] cmds = new String[] {
 			"open_jtalk",
@@ -62,7 +66,7 @@ public class JapaneseTalk {
 			"-p", "240",
 			"-a", "0.55",
 			"-m", htsVoicePath,
-			"-ow", wavTargetPath,
+			"-ow", wavTargetDir + "/" + targetName,
 			"-x", naistDictDir
 		};
 		Process proc = runtime.exec(cmds);
