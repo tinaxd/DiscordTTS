@@ -20,18 +20,20 @@ public class BotAudioManager {
 	private TrackScheduler trackScheduler;
 	private final JapaneseTalk tts;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final String guildId;
 	
-	public BotAudioManager() {
+	public BotAudioManager(String guildId) {
 		playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerLocalSource(playerManager);
 		player = playerManager.createPlayer();
 		trackScheduler = new TrackScheduler(player);
 		player.addListener(trackScheduler);
 		tts = JapaneseTalk.getInstance();
+		this.guildId = guildId;
 	}
 	
 	private void loadAndPlayWavTrack() {
-		playerManager.loadItem(tts.getWavTargetPath(), new AudioLoadResultHandler() {
+		playerManager.loadItem(tts.getWavTargetPath(guildId), new AudioLoadResultHandler() {
 
 			@Override
 			public void trackLoaded(AudioTrack track) {
@@ -57,7 +59,7 @@ public class BotAudioManager {
 	}
 	
 	public void playTTS(String msg) throws IOException, TTSException {
-		tts.createTTSFile(msg);
+		tts.createTTSFile(msg, guildId);
 		loadAndPlayWavTrack();
 	}
 	
