@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -48,11 +50,7 @@ public class GuildManager {
 		if (raw[0].equals("!ttsbird")) {
 			MessageChannel chan = event.getChannel();
 			if (raw.length > 1) {
-				if (raw[1].equals("join")) {
-					processJoin(event, raw);
-				} else if (raw[1].equals("leave")) {
-					processLeave(event);
-				} else if (raw[1].equals("block")) {
+				if (raw[1].equals("block")) {
 					processBlock(event, raw);
 				} else if (raw[1].equals("blocklist")) {
 					processBlocklist(event);
@@ -68,27 +66,45 @@ public class GuildManager {
 			}
 		}
 	}
+
+	public void onJoinTTS(SlashCommandInteractionEvent event) {
+		processJoin(event);
+	}
+
+	public void onLeaveTTS(SlashCommandInteractionEvent event) {
+		processLeave(event);
+	}
 	
-	private void processJoin(MessageReceivedEvent event, String[] raw) {
+	private void processJoin(SlashCommandInteractionEvent event) {
 		try {
 			Guild guild = event.getGuild();
+			if (guild == null) {
+				event.reply("内部エラー").setEphemeral(true).queue();
+				return;
+			}
 			List<VoiceChannel> voices = guild.getVoiceChannels();
 			// search a voice channel with the sender
 			Optional<VoiceChannel> vc = voices.stream().filter(ch -> ch.getMembers().contains(event.getMember()))
 			                 .findFirst();
 			if (vc.isEmpty()) {
-				event.getChannel().sendMessage("ボイスチャンネルに入ってから呼んでね").submit();
+				event.reply("VC に参加してから呼んでね").setEphemeral(true).queue();
 			} else {
-				//chan.sendMessage(String.format("Joining %s voice channel...", vc.get().getName())).submit();
 				joinVoiceChannel(guild.getAudioManager(), vc.get());
+				event.reply("VC に参加したよ").setEphemeral(true).queue();
 			}
 		} catch (IllegalStateException ex) {
 			System.out.println("user sent from outside text channels");
 		}
 	}
 	
-	private void processLeave(MessageReceivedEvent event) {
+	private void processLeave(SlashCommandInteractionEvent event) {
+		var guild = event.getGuild();
+		if (guild == null) {
+			event.reply("内部エラー").setEphemeral(true).queue();
+			return;
+		}
 		leaveVoiceChannel(event.getGuild().getAudioManager());
+		event.reply("VC から退出したよ").setEphemeral(true).queue();
 	}
 	
 	private void processBlock(MessageReceivedEvent event, String[] raw) {

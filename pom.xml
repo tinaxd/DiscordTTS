@@ -27,7 +27,7 @@
     <dependency>
     	<groupId>net.dv8tion</groupId>
     	<artifactId>JDA</artifactId>
-    	<version>4.2.0_241</version>
+    	<version>5.0.0-beta.22</version>
     	<scope>compile</scope>
     </dependency>
     <dependency>
@@ -93,7 +93,15 @@
          		</execution>
          	</executions>
          </plugin>
-    </plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				<source>14</source>
+				<target>14</target>
+			</configuration>
+		</plugin>
+	</plugins>
   </build>
 
   <reporting>
